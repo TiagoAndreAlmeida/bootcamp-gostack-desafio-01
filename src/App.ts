@@ -33,10 +33,11 @@ class App {
             const title: string = req.body.title;
             let tasks: Array<string> = req.body.tasks;
             
+            //check if id or title are undefined
             if(id && title) {
                 //check if field tasks are undefined
                 tasks = tasks == undefined ? [] : tasks;
-                
+
                 let newTask = new Task(id, title, tasks);
                 this.tasks.push(newTask);
                 res.send(newTask).json();
