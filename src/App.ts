@@ -45,6 +45,27 @@ class App {
                 res.status(400).send({"message": "you must send both fields id and title"}).json();
             }
         });
+
+        this.express.route('/projects/:id').put((req: Request, res: Response) => {
+            const id = Number.parseInt(req.params.id);
+            const title = req.body.title;
+
+            if(title == undefined) res.status(400).send({"message": "you must send field title"}).json();
+
+            let task = this.tasks.find( item => item.id == id);
+            task.title = title;
+
+            res.send(task).json();
+        });
+
+        this.express.route('/projects/:id').delete((req: Request, res: Response) => {
+            const id = Number.parseInt(req.params.id);
+
+            const index = this.tasks.findIndex( item => item.id == id);
+            const task = this.tasks.splice(index, 1);
+
+            res.send(task).json();
+        });
     }
 }
 
