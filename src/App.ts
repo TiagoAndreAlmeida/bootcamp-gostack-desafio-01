@@ -1,4 +1,4 @@
-import express, { Application, Request, Response} from 'express';
+import express, { Application, Request, Response, NextFunction} from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
@@ -8,6 +8,7 @@ class App {
     public express: Application;
 
     private tasks: Array<Task>;
+    private requestTimes: number;
 
     public constructor () {
         this.express = express();
@@ -15,11 +16,20 @@ class App {
         this.routes();
 
         this.tasks = [];
+        this.requestTimes = 0;
+
     }
 
     private middlewares (): void {
         this.express.use(cors());
         this.express.use(bodyParser.json());
+        this.express.use(this.onRequestCount.bind(this));
+    }
+
+    private onRequestCount (req: Request, res: Response, next: Function): void {
+        this.requestTimes++;
+        console.log(this.requestTimes);
+        next();
     }
 
     private routes (): void {
