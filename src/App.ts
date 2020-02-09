@@ -32,13 +32,25 @@ class App {
         next();
     }
 
+    private checkProjectExist (req: Request, res: Response, next: Function): void {
+        const id = Number.parseInt(req.params.id);
+        const project = this.tasks.find(item => item.id == id);
+
+        if(!project) {
+            res.status(400).send({"message": "project not found"}).json();
+        } else {
+            next();
+        }
+
+    }
+
     private routes (): void {
         //list all projects
         this.express.get('/', (req: Request, res: Response) => {
             res.send(this.tasks).json();
         });
         //create a new projects
-        this.express.route('/projects').post((req: Request, res: Response) => {
+        this.express.post('/projects', (req: Request, res: Response) => {
             const id: number = req.body.id;
             const title: string = req.body.title;
             let tasks: Array<string> = req.body.tasks;
@@ -54,9 +66,9 @@ class App {
             } else {
                 res.status(400).send({"message": "you must send both fields id and title"}).json();
             }
-        });
+        }, this.checkProjectExist);
 
-        this.express.route('/projects/:id').put((req: Request, res: Response) => {
+        this.express.put('/projects/:id', this.checkProjectExist.bind(this), (req: Request, res: Response) => {
             const id = Number.parseInt(req.params.id);
             const title = req.body.title;
 
@@ -68,7 +80,7 @@ class App {
             res.send(task).json();
         });
 
-        this.express.route('/projects/:id').delete((req: Request, res: Response) => {
+        this.express.delete('/projects/:id', this.checkProjectExist.bind(this), (req: Request, res: Response) => {
             const id = Number.parseInt(req.params.id);
 
             const index = this.tasks.findIndex( item => item.id == id);
